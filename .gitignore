@@ -12,3 +12,6 @@ anon.session
 
 # Test Script
 test.py
+
+# database files
+.csv

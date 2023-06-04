@@ -1,5 +1,6 @@
 import os
 import re
+import csv
 from collections import defaultdict
 from telethon import events
 from telethon import TelegramClient
@@ -60,6 +61,20 @@ def linkedin_finder(s, linkedin_links):
     url = re.findall(regex, s)
     linkedin_links.extend(url)
 
+async def dic_to_csv():
+    # Write dictionary into csv file
+    csv_columns = ['User ID', 'first_name', 'last_name', 'username', 'phone', 'linkedin', 'email', 'twitter']
+    try:
+        with open("database.csv", "w") as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            for key, val in sorted(database.items()):
+                row = {'User ID': key}
+                row.update(val)
+                writer.writerow(row)
+    except IOError:
+        print("I/O error")
+
 # Main function
 async def main():
 
@@ -93,8 +108,9 @@ async def main():
         except Exception as e:
             print("Group Chat called {}".format(name))
 
-    # Where the population of the database into a different file should be
-    print(database)
+    # Where the population of the database into a csv file happens
+    # print(database)
+    await dic_to_csv()
 
 # Runs until main is complete for now, then runs begins event handling
 with client:
