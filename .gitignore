@@ -14,4 +14,4 @@ anon.session
 test.py
 
 # database files
-.csv
+*.csv
