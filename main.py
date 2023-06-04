@@ -50,7 +50,7 @@ def email_finder(text, emails):
 # Function for adding twitter username parsed from a string to twitter_names
 def twitter_finder(str, twitter_name):
     # Regex expression to match for twitter usernames
-    same = re.findall(r'(?<=^|(?<=[^a-zA-Z0-9-_\.]))(@[A-Za-z]+[A-Za-z0-9-_]+)', str)
+    same = re.findall(r'(?<=^|(?<=[^a-zA-Z0-9-_\.]))(@[A-Za-z0-9-_]+)', str)
     twitter_name.extend(same)
 
 # Function for adding linkedin links parsed from a string to linkedin_links
