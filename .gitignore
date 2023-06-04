@@ -8,7 +8,7 @@ env.bak/
 venv.bak/
 
 # User Sessions
-anon.session
+*.session
 
 # Test Script
 test.py
