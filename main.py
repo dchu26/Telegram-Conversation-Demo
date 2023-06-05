@@ -1,11 +1,21 @@
 import os
 import re
 import csv
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from collections import defaultdict
 from telethon import events
 from telethon import TelegramClient
 from telethon.tl.functions.users import GetFullUserRequest
 from dotenv import load_dotenv, find_dotenv
+
+# Scope for the Google service account
+scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
+         "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+
+# Credentials from Google cloud account
+credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+gclient = gspread.authorize(credentials)
 
 # Loads the .env file
 load_dotenv(find_dotenv())
@@ -34,7 +44,20 @@ async def handler(event):
     database[event.message.peer_id.user_id]["twitter"].extend(t)
     database[event.message.peer_id.user_id]["email"].extend(e)
     database[event.message.peer_id.user_id]["linkedin"].extend(l)
-    print(database)
+
+    # Updates the csv file again
+    await dic_to_csv()
+
+    # Updates the Google sheet
+    await csv_to_google()
+
+# Basic function to write csv data to the Google sheet
+async def csv_to_google():
+    spreadsheet = gclient.open('CSV-to-Google-Sheet')
+
+    with open('database.csv', 'r') as file_obj:
+        content = file_obj.read()
+        gclient.import_csv(spreadsheet.id, data=content)
 
 # Function for adding names to dialog_names
 async def name_finder():
@@ -111,6 +134,8 @@ async def main():
     # Where the population of the database into a csv file happens
     # print(database)
     await dic_to_csv()
+    
+    await csv_to_google()
 
 # Runs until main is complete for now, then runs begins event handling
 with client:
