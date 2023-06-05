@@ -124,7 +124,7 @@ client = gspread.authorize(credentials)
 
 spreadsheet = client.open('CSV-to-Google-Sheet')
 
-with open('data.csv', 'r') as file_obj:
+with open('database.csv', 'r') as file_obj:
     content = file_obj.read()
     client.import_csv(spreadsheet.id, data=content)
 ```
