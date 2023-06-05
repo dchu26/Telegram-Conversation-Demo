@@ -33,7 +33,7 @@ database = defaultdict(dict)
 dialog_names = []
 
 # Listener for new messages
-@client.on(events.NewMessage(outgoing=True))
+@client.on(events.NewMessage(incoming=True))
 async def handler(event):
     t = []
     e = []
@@ -139,6 +139,7 @@ async def main():
 
 # Runs until main is complete for now, then runs begins event handling
 with client:
-    client.loop.run_until_complete(main())
+    # Uncomment this line to retrieve full history of previous messages
+    # client.loop.run_until_complete(main())
     client.start()
     client.run_until_disconnected()
