@@ -75,7 +75,14 @@ For interacting with Google Sheet API first thing we have to do is create a proj
 5. Enable Google Drive API.
 6. Click on **Create Credentials**.
 7. Select the parameters and click on **What credentials do I need?**.
-8. Enter a Service Account Name and select Role.
+- **Which API are you using?** Google Drive API
+* **What data will you be accessing?** Application Data
++ **Are you planning to use this API with Compute Engine, Kubernetes Engine, App Engine, or Cloud Functions?** No, I'm not using them
+9. Enter a Service Account Name and select Role as *Editor*
+10. Return to the *Credentials* tab in the project dashboard
+11. Press the pencil nect to the service account name
+12. Above *Service account details*, locate and click on **KEYS**
+13. Press ADD KEY, *Create new key*, make sure *Key type* is JSON and press *Create*.
 
 A JSON file will be downloaded. We will need this JSON file in our script. So rename that file as *client_secret.json*. The content of the JSON file is as following:
 
