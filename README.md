@@ -2,7 +2,7 @@
  
  Instructions on how to use:
  
-### Signing In
+## Signing In
 
 Before working with Telegram’s API, you need to get your own API ID and hash:
 
@@ -62,3 +62,70 @@ If [aiohttp](https://docs.aiohttp.org/en/stable/) is installed, the library will
 
 If [hachoir](https://hachoir.readthedocs.io/en/latest/) is installed, it will be used to extract metadata from files when sending documents. Telegram uses this information to show the song’s performer, artist, title, duration, and for videos too (including size). Otherwise, they will default to empty values, and you can set the attributes manually.
 
+## CSV to Google Sheet
+
+We are going to use [gspread](https://gspread.readthedocs.io/en/latest/), which is a Python API for Google Sheets.
+
+For interacting with Google Sheet API first thing we have to do is create a project in [Google Developers Console](https://medium.com/craftsmenltd/from-csv-to-google-sheet-using-python-ef097cb014f9#:~:text=For%20interacting%20with%20Google%20Sheet%20API%20first%20thing%20we%20have%20to%20do%20is%20create%20a%20project%20in%20Google%20Developers%20Console%20and%20enable%20some%20APIs.%20To%20do%20that%20just%20follow%20the%20steps%20below.) and enable some APIs. To do that just follow the steps below.
+
+1. Click [here](https://console.developers.google.com/cloud-resource-manager) to create a project.
+2. Give the project a name.
+3. Go to project dashboard and click on + **ENABLE APIS AND SERVICES**.
+4. Search for **Google Drive API** and click on it.
+5. Enable Google Drive API.
+6. Click on **Create Credentials**.
+7. Select the parameters and click on **What credentials do I need?**.
+8. Enter a Service Account Name and select Role.
+
+A JSON file will be downloaded. We will need this JSON file in our script. So rename that file as *client_secret.json*. The content of the JSON file is as following:
+
+```
+{
+  "type": "service_account",
+  "project_id": "focus-zxzxzx-******",
+  "private_key_id": "****************************************",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n***private_key***\n-----END PRIVATE KEY-----\n",
+  "client_email": "google-sheet-demo@focus-zxzxzx-******.iam.gserviceaccount.com",
+  "client_id": "************************",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/google-sheet-demo%40focus-zxzxzx-******.iam.gserviceaccount.com"
+}
+```
+
+Go to your Google Drive and create an Google Sheet and name it **CSV-to-Google-Sheet**. Copy *client_email* value from the JSON file you have downloaded above and share that Google Sheet to this *client_email* with edit permission.
+
+Open up the terminal and run the following commands.
+
+```
+pip3 install gspread
+pip3 install oauth2client
+```
+
+Now create a Python file and name it upload.py. Copy and paste the following code in it.
+
+```
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
+         "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+
+credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+client = gspread.authorize(credentials)
+
+spreadsheet = client.open('CSV-to-Google-Sheet')
+
+with open('data.csv', 'r') as file_obj:
+    content = file_obj.read()
+    client.import_csv(spreadsheet.id, data=content)
+```
+
+Run the Python script with this command 
+```
+python3 upload.py 
+```
+Next, open **CSV-to-Google-Sheet** Google Sheet in your browser. 
+
+The complete code to help can be found in [this repository](https://github.com/nahidsaikat/CSV-to-Google-Sheet).
