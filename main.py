@@ -38,18 +38,33 @@ async def handler(event):
     t = []
     e = []
     l = []
+    messenger = event.message.peer_id.user_id
+    fullInfo = await client(GetFullUserRequest(messenger))
     twitter_finder(event.message.message, t)
     email_finder(event.message.message, e)
     linkedin_finder(event.message.message, l)
-    database[event.message.peer_id.user_id]["twitter"].extend(t)
-    database[event.message.peer_id.user_id]["email"].extend(e)
-    database[event.message.peer_id.user_id]["linkedin"].extend(l)
+
+    if messenger not in database:
+        database[messenger]["first_name"] = fullInfo.users[0].first_name
+        database[messenger]["last_name"] = fullInfo.users[0].last_name
+        database[messenger]["username"] = fullInfo.users[0].username
+        database[messenger]["phone"] = fullInfo.users[0].phone
+        database[messenger]["twitter"] = t
+        database[messenger]["email"] = e
+        database[messenger]["linkedin"] = l
+
+    else:
+        database[messenger]["twitter"].extend(t)
+        database[messenger]["email"].extend(e)
+        database[messenger]["linkedin"].extend(l)
 
     # Updates the csv file again
     await dic_to_csv()
 
     # Updates the Google sheet
     await csv_to_google()
+
+#########################################################################
 
 # Basic function to write csv data to the Google sheet
 async def csv_to_google():
