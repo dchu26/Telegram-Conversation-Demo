@@ -1,28 +1,35 @@
 import os
 import re
 import csv
+import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from collections import defaultdict
 from telethon import events
 from telethon import TelegramClient
 from telethon.tl.functions.users import GetFullUserRequest
-from dotenv import load_dotenv, find_dotenv
+from google.cloud import secretmanager
+#from dotenv import load_dotenv, find_dotenv
 
 # Scope for the Google service account
 scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
          "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
 
+# Add here
+
 # Credentials from Google cloud account
-credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(client_json, scope)
 gclient = gspread.authorize(credentials)
 
 # Loads the .env file
-load_dotenv(find_dotenv())
+#load_dotenv(find_dotenv())
 
 # Retrieves the API_ID and API_HASH from the .env file
-api_id = os.environ.get("API_ID")
-api_hash = os.environ.get("API_HASH")
+#api_id = os.environ.get("API_ID")
+#api_hash = os.environ.get("API_HASH")
+
+api_id = anon_json["API_ID"]
+api_hash = anon_json["API_HASH"]
 
 # Initiates the client, which is basically the account associated with the id and hash
 # 'anon' can be changed, this is just the name of the .session file
