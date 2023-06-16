@@ -137,4 +137,7 @@ Next, open **CSV-to-Google-Sheet** Google Sheet in your browser.
 
 The complete code to help can be found in [this repository](https://github.com/nahidsaikat/CSV-to-Google-Sheet).
 
- 
+### Using urllib to validate URLs
+```
+pip3 install urllib
+```
