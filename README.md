@@ -137,8 +137,4 @@ Next, open **CSV-to-Google-Sheet** Google Sheet in your browser.
 
 The complete code to help can be found in [this repository](https://github.com/nahidsaikat/CSV-to-Google-Sheet).
 
-### How to Validate URLs
- ```
- $ python3 -m pip install validators
- ```
  
