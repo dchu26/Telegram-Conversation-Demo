@@ -2,7 +2,7 @@ import os
 import re
 import csv
 import gspread
-import validators 
+import validators
 from oauth2client.service_account import ServiceAccountCredentials
 from collections import defaultdict
 from telethon import events
@@ -16,7 +16,8 @@ scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/au
          "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
 
 # Credentials from Google cloud account
-credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name(
+    'client_secret.json', scope)
 gclient = gspread.authorize(credentials)
 
 # Loads the .env file
@@ -34,8 +35,9 @@ client = TelegramClient('anon', api_id, api_hash)
 database = defaultdict(dict)
 dialog_names = []
 
+
 # Listener for new messages
-@client.on(events.NewMessage(incoming=True))
+@client.on(events.NewMessage())
 async def handler(event):
     t = []
     e = []
@@ -66,7 +68,9 @@ async def handler(event):
     # Updates the Google sheet
     await csv_to_google()
 
-#########################################################################
+
+############################################################################
+
 
 # Basic function to write csv data to the Google sheet
 async def csv_to_google():
@@ -76,11 +80,13 @@ async def csv_to_google():
         content = file_obj.read()
         gclient.import_csv(spreadsheet.id, data=content)
 
+
 # Function for adding names to dialog_names
 async def name_finder():
     async for dialog in client.iter_dialogs():
-        #print(dialog.name, 'has ID', dialog.id)
+        # print(dialog.name, 'has ID', dialog.id)
         dialog_names.append(dialog.name)
+
 
 # Function for adding emails parsed from a string to emails
 def email_finder(text, emails):
@@ -88,30 +94,38 @@ def email_finder(text, emails):
     match = re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)
     emails.extend(match)
 
+
 # Function for adding twitter username parsed from a string to twitter_names
 def twitter_finder(str, twitter_name):
     # Regex expression to match for twitter usernames
     same = re.findall(r'(?<=^|(?<=[^a-zA-Z0-9-_\.]))(@[A-Za-z0-9-_]+)', str)
     twitter_name.extend(same)
 
+
 # Function for adding linkedin links parsed from a string to linkedin_links
 def linkedin_finder(s, linkedin_links):
     # Regex expression for only linkedin links
     regex = r'(https?:\/\/[\w]+\.?linkedin\.com\/in\/[A-z0-9_-]+\/?)'
-    url = re.findall(regex, s)
+    urls = re.findall(regex, s)
+    workingLinks = []
+
     # Validate linkedin links
-    validation = validators.url(url)
-    if validation:
-         linkedin_links.extend(url)
-    else:
-         print("URL is invalid")
+    for url in urls:
+        validation = validators.url(url)
+        if validation:
+            workingLinks.append(url)
+
+    linkedin_links.extend(workingLinks)
+
 
 async def dic_to_csv():
     # Write dictionary into csv file
-    csv_columns = ['User ID', 'first_name', 'last_name', 'username', 'phone', 'linkedin', 'email', 'twitter']
+    csv_columns = ['User ID', 'first_name', 'last_name',
+                   'username', 'phone', 'linkedin', 'email', 'twitter']
     try:
         with open("database.csv", "w") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer = csv.DictWriter(
+                csvfile, fieldnames=csv_columns, lineterminator='\n')
             writer.writeheader()
             for key, val in sorted(database.items()):
                 row = {'User ID': key}
@@ -120,12 +134,13 @@ async def dic_to_csv():
     except IOError:
         print("I/O error")
 
+
 # Main function
 async def main():
 
     # Populates dialog_names
     await name_finder()
-    
+
     # Gets the full profile information for the first user in each conversation
     for name in dialog_names:
         try:
@@ -144,7 +159,7 @@ async def main():
                 email_finder(message.text, emails)
                 twitter_finder(message.text, twitter_name)
                 linkedin_finder(message.text, linkedin_links)
-            
+
             database[user.id]["linkedin"] = linkedin_links
             database[user.id]["email"] = emails
             database[user.id]["twitter"] = twitter_name
@@ -156,7 +171,7 @@ async def main():
     # Where the population of the database into a csv file happens
     # print(database)
     await dic_to_csv()
-    
+
     await csv_to_google()
 
 # Runs until main is complete for now, then runs begins event handling
