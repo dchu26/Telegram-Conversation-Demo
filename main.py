@@ -2,12 +2,14 @@ import os
 import re
 import csv
 import gspread
+import validators 
 from oauth2client.service_account import ServiceAccountCredentials
 from collections import defaultdict
 from telethon import events
 from telethon import TelegramClient
 from telethon.tl.functions.users import GetFullUserRequest
 from dotenv import load_dotenv, find_dotenv
+from urllib.parse import urlparse
 
 # Scope for the Google service account
 scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
@@ -97,7 +99,12 @@ def linkedin_finder(s, linkedin_links):
     # Regex expression for only linkedin links
     regex = r'(https?:\/\/[\w]+\.?linkedin\.com\/in\/[A-z0-9_-]+\/?)'
     url = re.findall(regex, s)
-    linkedin_links.extend(url)
+    # Validate linkedin links
+    validation = validators.url(url)
+    if validation:
+         linkedin_links.extend(url)
+    else:
+         print("URL is invalid")
 
 async def dic_to_csv():
     # Write dictionary into csv file
