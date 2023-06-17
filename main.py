@@ -204,7 +204,9 @@ def linkedin_finder(s, linkedin_links):
 # Main function
 async def main():
 
+    # Pulling data from Google Sheets and populating our database (dict)
     google_to_dict()
+    # Moving our data from the dict into the CSV
     dic_to_csv()
     
     '''
