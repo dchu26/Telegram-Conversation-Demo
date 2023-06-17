@@ -101,6 +101,7 @@ def google_to_dict():
         database[record[first_key]] = record_without_first
     
     # Converting the string representation of the lists into lists when applicable
+    # ast.literal_eval() is quite strict on conversion so we have to check if it is valid to convert before we actually do it
     for key in database:
         if is_valid_list_string(database[key]['linkedin']):
             database[key]['linkedin'] = ast.literal_eval(database[key]['linkedin'])
